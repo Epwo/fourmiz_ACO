@@ -11,5 +11,5 @@ class Lieu:
         coords = (self.x, self.y)
         return coords
 
-    def calc_dist_eucl(self, coord1, coord2):
-        return dist(coord1, coord2)
+    def calc_dist_eucl(self, LieuDest):
+        return dist(self.get_coords(), LieuDest.get_coords())
