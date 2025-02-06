@@ -1,5 +1,5 @@
-from ..Classes.GraphClass import Graph
-from ..Classes.LieuClass import Lieu
+from Classes.GraphClass import Graph
+from Classes.LieuClass import Lieu
 
 lieu1 = Lieu(0, 0, "lieu1")
 lieu2 = Lieu(1, 1, "lieu2")
