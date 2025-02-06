@@ -11,6 +11,6 @@ class Graph(Lieu):
         self.matrice_cout_od = np.zeros((self.nb_lieux, self.nb_lieux))
         for i in range(self.nb_lieux):
             for j in range(self.nb_lieux):
-                self.matrice_cout_od[i][j] = self.liste_lieux[i].distance(
+                self.matrice_cout_od[i][j] = self.liste_lieux[i].calc_dist_eucl(
                     self.liste_lieux[j]
                 )
