@@ -1,8 +1,12 @@
 from math import dist
 
+"""
+Maybe change to compute dist manually for better optimization
+"""
+
 
 class Lieu:
-    def __init__(self, x, y, nom):
+    def __init__(self, x, y, nom="unamed"):
         self.x = x
         self.y = y
         self.nom = nom
