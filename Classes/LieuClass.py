@@ -7,9 +7,9 @@ class Lieu:
         self.y = y
         self.nom = nom
 
-    def get_coordonnee(self):
-        coordonnee = (self.x, self.y)
-        return coordonnee
+    def get_coords(self):
+        coords = (self.x, self.y)
+        return coords
 
     def calc_dist_eucl(self, coord1, coord2):
         return dist(coord1, coord2)
