@@ -1,14 +1,15 @@
 from math import dist
 
+
 class Lieu:
     def __init__(self, x, y, nom):
         self.x = x
         self.y = y
         self.nom = nom
 
-    def getcoordonnee(self):
+    def get_coordonnee(self):
         coordonnee = (self.x, self.y)
         return coordonnee
 
-    def euclidienne(self, coord_other):
-        return dist(self.getcoordonnee(), coord_other)
+    def calc_dist_eucl(self, coord1, coord2):
+        return dist(coord1, coord2)
