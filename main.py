@@ -1,7 +1,7 @@
 from logic import TSP_ACO
 
-nb_fourmis = 1
-nb_iter = 100
+nb_fourmis = 5
+nb_iter = 1
 alpha = 1
 beta = 1
 rho = 0.5
@@ -18,8 +18,9 @@ with open("src/graph_5.csv", "r") as f:
 
 aco = TSP_ACO(list_lieux, nb_fourmis, nb_iter, alpha, beta, rho, q, q0)
 aco.init_fourmis()
-print(aco.graph.matrice_cout_od)
 
-for e in aco.fourmis:
-    print(e.get_attributes())
-print("coo")
+# for e in aco.fourmis:
+#     print(e.get_attributes())
+# print("coo")
+
+aco.wip()

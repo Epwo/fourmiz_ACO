@@ -8,6 +8,7 @@ class Graph(Lieu):
         for e in list_lieux:
             self.liste_lieux.append(Lieu(e[0], e[1], e[2]))
         self.nb_lieux = len(list_lieux)
+        self.matrice_pheromones = np.zeros((self.nb_lieux, self.nb_lieux))
 
     def calcul_matrice_cout_od(self):
         self.matrice_cout_od = np.zeros((self.nb_lieux, self.nb_lieux))

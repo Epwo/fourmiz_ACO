@@ -1,5 +1,8 @@
+from Classes.LieuClass import Lieu
+
+
 class Fourmi:
-    def __init__(self, start_point, nb):
+    def __init__(self, start_point: Lieu, nb):
         self.start_point = start_point
         self.current_point = start_point
         self.visited_points = [start_point]
