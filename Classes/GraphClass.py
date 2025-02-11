@@ -4,7 +4,9 @@ from Classes.LieuClass import Lieu
 
 class Graph(Lieu):
     def __init__(self, list_lieux):
-        self.liste_lieux = list_lieux
+        self.liste_lieux = []
+        for e in list_lieux:
+            self.liste_lieux.append(Lieu(e[0], e[1], e[2]))
         self.nb_lieux = len(list_lieux)
 
     def calcul_matrice_cout_od(self):
