@@ -1,10 +1,25 @@
 import math
+import random
 
 
 class Route:
 
-    def __init__(self, ordre, matrice_od):
-        self.ordre = ordre
+    def __init__(self, matrice_od, ordre_init=None):
+
+        N = len(matrice_od.shape[0])
+
+        if ordre_init is None:
+            ordre_init = list(range(1, N))
+            random.shuffle(ordre_init)
+            ordre_init.insert(0, 0)
+            ordre_init.append(0)
+
+        if ordre_init[-1] != ordre_init[0]:
+            raise ValueError(
+                "Le point de départ doit être le même que le point d'arrivée"
+            )
+
+        self.ordre = ordre_init[:]
         self.matrice_od = matrice_od
 
     def calcul_distance_route(self):
@@ -18,9 +33,3 @@ class Route:
             distance_totale += self.matrice_od[lieu_depart][lieu_arrivee]
 
         return distance_totale
-
-
-ordre = [0, 1, 2, 0]
-matrice_od = [[0, 10, 15], [10, 0, 20], [15, 20, 0]]
-route = Route(ordre=ordre, matrice_od=matrice_od)
-print(route.calcul_distance_route())
