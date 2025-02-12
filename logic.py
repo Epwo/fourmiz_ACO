@@ -7,17 +7,17 @@ import random
 
 
 class TSP_ACO(Graph):
-    def __init__(self, list_lieux, nb_fourmis, nb_iter, alpha, beta, rho, q, q0):
+    def __init__(self, list_lieux, nb_fourmis, nb_iter, alpha, beta, rho, q):
         self.nb_fourmis = nb_fourmis
         self.nb_iter = nb_iter
         self.alpha = alpha
         self.beta = beta
         self.rho = rho
         self.q = q
-        self.q0 = q0
         self.fourmis: list[Fourmi] = []
         self.graph = Graph(list_lieux)
         self.graph.calcul_matrice_cout_od()
+        self.shortest_route = {"route": [], "distance": float("inf")}
 
     def init_fourmis(self):
         self.fourmis = []
@@ -52,17 +52,18 @@ class TSP_ACO(Graph):
     ):
         probas = {}
 
-        for point in points:
-            max_value = int(max(max(row) for row in mat_od))
-            print(f"current point {current_point} ; next point {point.nom}")
-            is_unvisited = 1 if point not in visited_points else 0
-            print(f"isUnvisited {is_unvisited == 1}")
-            eq = (
-                -(mat_od[current_point][point.nom] * (1 / 3))
-                + (mat_phero[current_point][point.nom] * (1 / 3))
-                + (1 / 3) * random.randint(0, max_value)
-            ) * is_unvisited
-            probas[point.nom] = eq
+        remaining_points = [p.nom for p in points if p not in visited_points]
+        list_eq1 = []
+        for next_point in remaining_points:
+            eq1 = ((mat_phero[current_point][next_point]) ** self.alpha) * (
+                (1 / mat_od[current_point][next_point]) ** self.beta
+            )
+            list_eq1.append(eq1)
+        probas = {
+            remaining_points[i]: list_eq1[i] / sum(list_eq1)
+            for i in range(len(remaining_points))
+        }
+        # we divide by the sum of the list to have a sum of 1 ( and probabilities between 0 & 1)
         print(probas)
         return probas
 
@@ -71,8 +72,9 @@ class TSP_ACO(Graph):
         fourmi: Fourmi,
         graph: Graph,
     ):
+
         # calculate the probability of going to each point
-        proba = self.calc_next_point(
+        probas = self.calc_next_point(
             mat_od=graph.matrice_cout_od,
             points=graph.liste_lieux,
             current_point=fourmi.current_point.nom,
@@ -81,14 +83,13 @@ class TSP_ACO(Graph):
         )
 
         # choose the next point
-        proba = {k: v for k, v in proba.items() if v != 0}
-        # we remove all of the 0 values
-        if proba == {}:
+        if probas == {}:
             # we are on the last point, lets go back on the first one
-            next_point_name = graph.liste_lieux[0].nom
+            next_point_name = fourmi.visited_points[0].nom
         else:
-            next_point_name = max(proba, key=proba.get)
-            print(">>", next_point_name)
+            choices = list(probas.keys())
+            weights = list(probas.values())
+            next_point_name = random.choices(choices, weights=weights)[0]
 
         next_point = next(
             point for point in graph.liste_lieux if point.nom == next_point_name
@@ -102,25 +103,21 @@ class TSP_ACO(Graph):
         print(fourmi.get_attributes())
 
     def update_pheromones(self, fourmis: list[Fourmi]):
-        dist_routes = {}
-        for i, fourmi in enumerate(fourmis):
-            list_lieux = fourmi.visited_points
-            route = Route(list_lieux, self.graph.matrice_cout_od)
-            dist_routes[i] = route.calcul_distance_route()
-        best_dist = min(dist_routes.values())
-        best_route: list[Lieu] = fourmis[
-            min(dist_routes, key=dist_routes.get)
-        ].visited_points
-        print(
-            f"best route: {best_route} for fourmi {min(dist_routes, key=dist_routes.get)} for dist {best_dist}"
-        )
-        # update pheromones
         print(f"olds pheromones: {self.graph.matrice_pheromones}")
-        for i in range(len(best_route) - 1):
-            x_value = best_route[i].nom
-            y_value = best_route[i + 1].nom
-            self.graph.matrice_pheromones[x_value][y_value] = (
-                (max(max(row) for row in self.graph.matrice_cout_od)) / 2
-            ) + self.graph.matrice_pheromones[x_value][y_value]
+        for fourmi in fourmis:
+            visited_lieux = fourmi.visited_points
+            route = Route(visited_lieux, self.graph.matrice_cout_od)
+            dist_tot = route.calcul_distance_route()
+            if dist_tot < self.shortest_route["distance"]:
+                self.shortest_route["route"] = visited_lieux
+                self.shortest_route["distance"] = dist_tot
+            amount_pheromones = self.q / dist_tot
+
+            for i in range(len(visited_lieux) - 1):
+                x_value = visited_lieux[i].nom
+                y_value = visited_lieux[i + 1].nom
+                self.graph.matrice_pheromones[x_value][y_value] = (
+                    self.rho * self.graph.matrice_pheromones[x_value][y_value]
+                ) + amount_pheromones
 
         print(f"new pheromones: \n {self.graph.matrice_pheromones}")
