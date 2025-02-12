@@ -2,7 +2,7 @@ from logic import TSP_ACO
 
 nb_fourmis = 5
 nb_iter = 15
-
+# TODO: change values of alpha, beta, q, rho (find optimal values)
 alpha = 1
 beta = 1
 q = 1
