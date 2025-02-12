@@ -10,14 +10,16 @@ rho = 0.5
 
 list_lieux = []
 
-with open("src/graph_20.csv", "r") as f:
+file_path = "src/graph_200.csv"
+
+with open(file_path, "r") as f:
     next(f)  # Skip header line
     for i, line in enumerate(f):
         x = float(line.split(",")[0])
         y = float(line.split(",")[-1].strip())
         list_lieux.append([x, y, i])
 
-aco = TSP_ACO(list_lieux, nb_fourmis, nb_iter, alpha, beta, rho, q)
+aco = TSP_ACO(list_lieux, nb_fourmis, nb_iter, alpha, beta, rho, q, file_path)
 aco.init_fourmis()
 
 

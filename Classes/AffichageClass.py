@@ -2,6 +2,7 @@ import tkinter as tk
 import pandas as pd
 import math
 import numpy as np
+
 RAYON = 20
 LARGEUR = 800
 HAUTEUR = 600
@@ -28,7 +29,7 @@ class Affichage:
         self.root.bind("<Escape>", lambda event: self.root.quit())
         self.dessiner_lieux()
         self.distance_min = 0
-        self.route_main = []
+        self.best_route = []
         self.matrice_pheromone = []
         self.liste_de_route = []
 
@@ -37,8 +38,12 @@ class Affichage:
         for i in range(len(self.x)):
             x, y = float(self.x[i]), float(self.y[i])
             self.canvas.create_oval(
-                x - RAYON, y - RAYON, x + RAYON, y + RAYON,
-                fill="lightblue", outline="black"
+                x - RAYON,
+                y - RAYON,
+                x + RAYON,
+                y + RAYON,
+                fill="lightblue",
+                outline="black",
             )
             self.canvas.create_text(x, y, text=str(i), font=("Arial", 12, "bold"))
 
@@ -56,57 +61,105 @@ class Affichage:
         self.dessiner_lieux()
         min_value = np.min(self.matrice_pheromone)
         max_value = np.max(self.matrice_pheromone)
-        self.matrice_pheromone = ((self.matrice_pheromone - min_value) / (max_value - min_value)) * 2
-        # Convertir route_main en ensemble de tuples pour une recherche rapide
-        route_main_set = {(self.route_main[i], self.route_main[i + 1]) for i in range(len(self.route_main) - 1)}
-        # Dessiner les routes en noir sauf si elles sont dans route_main
+        self.matrice_pheromone = (
+            (self.matrice_pheromone - min_value) / (max_value - min_value)
+        ) * 2
+        # Convertir best_route en ensemble de tuples pour une recherche rapide
+        best_route_set = {
+            (self.best_route[i], self.best_route[i + 1])
+            for i in range(len(self.best_route) - 1)
+        }
+        # Dessiner les routes en noir sauf si elles sont dans best_route
         for elt in self.liste_de_route:
             longueur_par_route = 0
-            for i in range(len(elt) - 1):
+            for i in range(len(elt) - 2):
                 x1, y1 = float(self.x[elt[i]]), float(self.y[elt[i]])
                 x2, y2 = float(self.x[elt[i + 1]]), float(self.y[elt[i + 1]])
                 longueur_par_route += self.matrice_od[elt[i]][elt[i + 1]]
-                if (elt[i], elt[i + 1]) not in route_main_set and (elt[i + 1], elt[i]) not in route_main_set:
+                if (elt[i], elt[i + 1]) not in best_route_set and (
+                    elt[i + 1],
+                    elt[i],
+                ) not in best_route_set:
                     cout = self.matrice_pheromone[elt[i]][elt[i + 1]]
                     if cout > 0:
-                        self.canvas.create_line(x1, y1, x2, y2, fill="black", width=cout)
+                        self.canvas.create_line(
+                            x1, y1, x2, y2, fill="black", width=cout
+                        )
             self.meilleures_routes[str(longueur_par_route)] = elt
         longueur_par_route = 0
         # Dessiner la route principale en bleu
-        for i in range(len(self.route_main) - 1):
-            longueur_par_route += self.matrice_od[self.route_main[i]][self.route_main[i + 1]]
-            cout = self.matrice_pheromone[self.route_main[i]][self.route_main[i + 1]]
+        for i in range(len(self.best_route) - 1):
+            longueur_par_route += self.matrice_od[self.best_route[i]][
+                self.best_route[i + 1]
+            ]
+            cout = self.matrice_pheromone[self.best_route[i]][self.best_route[i + 1]]
             if cout > 0:
-                x1, y1 = float(self.x[self.route_main[i]]), float(self.y[self.route_main[i]])
-                x2, y2 = float(self.x[self.route_main[i + 1]]), float(self.y[self.route_main[i + 1]])
-                self.canvas.create_line(x1, y1, x2, y2, fill="blue", width=1, dash=(4, 2))
-                self.canvas.create_text(x1, y1 - 25, text=str(i + 1), font=("Arial", 10, "bold"), fill="black")
+                x1, y1 = float(self.x[self.best_route[i]]), float(
+                    self.y[self.best_route[i]]
+                )
+                x2, y2 = float(self.x[self.best_route[i + 1]]), float(
+                    self.y[self.best_route[i + 1]]
+                )
+                self.canvas.create_line(
+                    x1, y1, x2, y2, fill="blue", width=1, dash=(4, 2)
+                )
+                self.canvas.create_text(
+                    x1,
+                    y1 - 25,
+                    text=str(i + 1),
+                    font=("Arial", 10, "bold"),
+                    fill="black",
+                )
                 self.distance_min += math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-        self.meilleures_routes[str(longueur_par_route)] = self.route_main
+        self.meilleures_routes[str(longueur_par_route)] = self.best_route
         self.nb_ite += 1
         print(self.nb_ite)
         self.info_zone.delete(1.0, tk.END)
-        self.info_zone.insert(tk.END, "Nombre d'itération: " + str(self.nb_ite) + ' meilleure distance trouvée: ' + str(
-            self.distance_min))
+        self.info_zone.insert(
+            tk.END,
+            "Nombre d'itération: "
+            + str(self.nb_ite)
+            + " meilleure distance trouvée: "
+            + str(self.distance_min),
+        )
 
-    def afficher_meilleures_routes(self, event, route_main):
+    def afficher_meilleures_routes(self, event, best_route):
         """Affiche les 5 meilleures routes enregistrées."""
         self.text_zone.delete(1.0, tk.END)
-        self.text_zone.insert(tk.END, "Affichage des ", str(NB_MEILLEURES_ROUTES)," meilleures routes:\n")
-        meilleures_routes_triees = sorted(self.meilleures_routes.items(), key=lambda x: float(x[0]))[
-                                   :NB_MEILLEURES_ROUTES]
+        self.text_zone.insert(
+            tk.END, "Affichage des ", str(NB_MEILLEURES_ROUTES), " meilleures routes:\n"
+        )
+        meilleures_routes_triees = sorted(
+            self.meilleures_routes.items(), key=lambda x: float(x[0])
+        )[:NB_MEILLEURES_ROUTES]
 
         # Afficher les 4 meilleures routes
         for i, (distance, route) in enumerate(meilleures_routes_triees):
-            self.text_zone.insert(tk.END, f"Route {i + 1}: Distance: {distance} - {route}\n")
+            self.text_zone.insert(
+                tk.END, f"Route {i + 1}: Distance: {distance} - {route}\n"
+            )
 
-    def update_graph(self, matrice, liste_de_route, route_main):
+    def update_graph(self, matrice, liste_de_route, best_route):
         """Met à jour l'affichage avec une nouvelle matrice."""
         if matrice is not None:
-            self.matrice_pheromone, self.liste_de_route, self.route_main = matrice, liste_de_route, route_main
+            best_route_noms = [lieu.nom for lieu in best_route]
+            liste_de_route_noms = [
+                [lieu.nom for lieu in route] for route in liste_de_route
+            ]
+
+            self.matrice_pheromone, self.liste_de_route, self.best_route = (
+                matrice,
+                liste_de_route_noms,
+                best_route_noms,
+            )
             self.mettre_a_jour()
             self.root.update_idletasks()
-            self.root.bind("<m>", lambda event: self.afficher_matrice(event, self.matrice_pheromone))
-            self.root.bind("<n>", lambda event: self.afficher_meilleures_routes(event, self.route_main))
+            self.root.bind(
+                "<m>",
+                lambda event: self.afficher_matrice(event, self.matrice_pheromone),
+            )
+            self.root.bind(
+                "<n>",
+                lambda event: self.afficher_meilleures_routes(event, self.best_route),
+            )
             self.root.update()
-
