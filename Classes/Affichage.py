@@ -1,7 +1,7 @@
 import tkinter as tk
 import pandas as pd
 import math
-
+import numpy as np
 RAYON = 20
 LARGEUR = 800
 HAUTEUR = 600
@@ -54,6 +54,9 @@ class Affichage:
         self.distance_min = 0
         self.canvas.delete("all")
         self.dessiner_lieux()
+        min_value = np.min(self.matrice_pheromone)
+        max_value = np.max(self.matrice_pheromone)
+        self.matrice_pheromone = ((self.matrice_pheromone - min_value) / (max_value - min_value)) * 2
         # Convertir route_main en ensemble de tuples pour une recherche rapide
         route_main_set = {(self.route_main[i], self.route_main[i + 1]) for i in range(len(self.route_main) - 1)}
         # Dessiner les routes en noir sauf si elles sont dans route_main
@@ -76,7 +79,7 @@ class Affichage:
             if cout > 0:
                 x1, y1 = float(self.x[self.route_main[i]]), float(self.y[self.route_main[i]])
                 x2, y2 = float(self.x[self.route_main[i + 1]]), float(self.y[self.route_main[i + 1]])
-                self.canvas.create_line(x1, y1, x2, y2, fill="blue", width=cout, dash=(4, 2))
+                self.canvas.create_line(x1, y1, x2, y2, fill="blue", width=1, dash=(4, 2))
                 self.canvas.create_text(x1, y1 - 25, text=str(i + 1), font=("Arial", 10, "bold"), fill="black")
                 self.distance_min += math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
         self.meilleures_routes[str(longueur_par_route)] = self.route_main
