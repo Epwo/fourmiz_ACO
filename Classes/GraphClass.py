@@ -19,3 +19,4 @@ class Graph(Lieu):
                 self.matrice_cout_od[i][j] = self.liste_lieux[i].calc_dist_eucl(
                     self.liste_lieux[j]
                 )
+
