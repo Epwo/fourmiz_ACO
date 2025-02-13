@@ -1,12 +1,17 @@
 from logic import TSP_ACO
+import json
+import random
 
-nb_fourmis = 5
-nb_iter = 15
-# TODO: change values of alpha, beta, q, rho (find optimal values)
-alpha = 1.67
-beta = 6.34
-q = 9.8
-rho = 0.43
+with open("currentHighScore.json", "r+") as f:
+    HS = json.load(f)
+    alpha = HS["alpha"]
+    beta = HS["beta"]
+    q = HS["q"]
+    rho = HS["rho"]
+
+
+nb_fourmis = 8
+nb_iter = 25
 
 list_lieux = []
 
@@ -20,8 +25,10 @@ with open(file_path, "r") as f:
         list_lieux.append([x, y, i])
 
 aco = TSP_ACO(list_lieux, nb_fourmis, nb_iter, alpha, beta, rho, q, file_path)
+aco.enable_display = False
 aco.init_fourmis()
 
-
 aco.run()
-print(aco.shortest_route)
+print("shortest route:")
+score = aco.shortest_route["distance"]
+print(score)
