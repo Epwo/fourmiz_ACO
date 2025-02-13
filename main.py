@@ -3,14 +3,14 @@ from logic import TSP_ACO
 nb_fourmis = 5
 nb_iter = 15
 # TODO: change values of alpha, beta, q, rho (find optimal values)
-alpha = 1
-beta = 1
-q = 1
-rho = 0.5
+alpha = 1.67
+beta = 6.34
+q = 9.8
+rho = 0.43
 
 list_lieux = []
 
-file_path = "src/graph_200.csv"
+file_path = "src/graph_20.csv"
 
 with open(file_path, "r") as f:
     next(f)  # Skip header line

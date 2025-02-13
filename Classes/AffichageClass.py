@@ -76,15 +76,15 @@ class Affichage:
                 x1, y1 = float(self.x[elt[i]]), float(self.y[elt[i]])
                 x2, y2 = float(self.x[elt[i + 1]]), float(self.y[elt[i + 1]])
                 longueur_par_route += self.matrice_od[elt[i]][elt[i + 1]]
-                if (elt[i], elt[i + 1]) not in best_route_set and (
-                    elt[i + 1],
-                    elt[i],
-                ) not in best_route_set:
-                    cout = self.matrice_pheromone[elt[i]][elt[i + 1]]
-                    if cout > 0:
-                        self.canvas.create_line(
-                            x1, y1, x2, y2, fill="black", width=cout
-                        )
+                # if (elt[i], elt[i + 1]) not in best_route_set and (
+                #     elt[i + 1],
+                #     elt[i],
+                # ) not in best_route_set:
+                #     cout = self.matrice_pheromone[elt[i]][elt[i + 1]]
+                #     if cout > 0:
+                #         self.canvas.create_line(
+                #             x1, y1, x2, y2, fill="black", width=cout
+                #         )
             self.meilleures_routes[str(longueur_par_route)] = elt
         longueur_par_route = 0
         # Dessiner la route principale en bleu
@@ -101,7 +101,7 @@ class Affichage:
                     self.y[self.best_route[i + 1]]
                 )
                 self.canvas.create_line(
-                    x1, y1, x2, y2, fill="blue", width=1, dash=(4, 2)
+                    x1, y1, x2, y2, fill="blue", width=cout, dash=(4, 2)
                 )
                 self.canvas.create_text(
                     x1,
