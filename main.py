@@ -12,7 +12,6 @@ with open("currentHighScore.json", "r+") as f:
 
 nb_fourmis = 8
 nb_iter = 25
-# TODO: change values of alpha, beta, q, rho (find optimal values)
 
 list_lieux = []
 
