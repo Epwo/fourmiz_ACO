@@ -2,12 +2,14 @@ from Classes.LieuClass import Lieu
 from Classes.GraphClass import Graph
 from Classes.RouteClass import Route
 from Classes.FourmiClass import Fourmi
+from Classes.AffichageClass import Affichage
 
+import time
 import random
 
 
 class TSP_ACO(Graph):
-    def __init__(self, list_lieux, nb_fourmis, nb_iter, alpha, beta, rho, q):
+    def __init__(self, list_lieux, nb_fourmis, nb_iter, alpha, beta, rho, q, file_path):
         self.nb_fourmis = nb_fourmis
         self.nb_iter = nb_iter
         self.alpha = alpha
@@ -18,6 +20,7 @@ class TSP_ACO(Graph):
         self.graph = Graph(list_lieux)
         self.graph.calcul_matrice_cout_od()
         self.shortest_route = {"route": [], "distance": float("inf")}
+        self.file_path = file_path
 
     def init_fourmis(self):
         self.fourmis = []
@@ -27,6 +30,7 @@ class TSP_ACO(Graph):
             self.fourmis.append(Fourmi(start_point, i))
 
     def run(self):
+        affi = Affichage(self.file_path, self.graph.matrice_cout_od)
         for i in range(self.nb_iter):
             # new fourmis generation
             print(f"--- Iteration {i} ---")
@@ -38,9 +42,18 @@ class TSP_ACO(Graph):
                         self.graph,
                     )
                 # finish the trajet, before updating pheromones
+            # finished lets display !!
+            route_lists = [fourmi.visited_points for fourmi in self.fourmis]
+            affi.update_graph(
+                matrice=self.graph.matrice_pheromones,
+                liste_de_route=route_lists,
+                best_route=self.shortest_route["route"],
+            )
             print(f"finished  G{i} updating pheromones")
             self.update_pheromones(fourmis=self.fourmis)
             self.init_fourmis()
+        print("---finished---")
+        affi.root.mainloop()
 
     def calc_next_point(
         self,
@@ -64,7 +77,6 @@ class TSP_ACO(Graph):
             for i in range(len(remaining_points))
         }
         # we divide by the sum of the list to have a sum of 1 ( and probabilities between 0 & 1)
-        print(probas)
         return probas
 
     def forward(
@@ -94,16 +106,11 @@ class TSP_ACO(Graph):
         next_point = next(
             point for point in graph.liste_lieux if point.nom == next_point_name
         )
-        print(
-            f"  for {fourmi.nom} Next point: {next_point.nom}, {next_point.x, next_point.y}"
-        )
         fourmi.current_point = next_point
         # add the point to the visited points
         fourmi.visited_points.append(next_point)
-        print(fourmi.get_attributes())
 
     def update_pheromones(self, fourmis: list[Fourmi]):
-        print(f"olds pheromones: {self.graph.matrice_pheromones}")
         for fourmi in fourmis:
             visited_lieux = fourmi.visited_points
             route = Route(visited_lieux, self.graph.matrice_cout_od)
@@ -119,5 +126,3 @@ class TSP_ACO(Graph):
                 self.graph.matrice_pheromones[x_value][y_value] = (
                     self.rho * self.graph.matrice_pheromones[x_value][y_value]
                 ) + amount_pheromones
-
-        print(f"new pheromones: \n {self.graph.matrice_pheromones}")
