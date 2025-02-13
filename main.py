@@ -10,7 +10,7 @@ with open("currentHighScore.json", "r+") as f:
     rho = HS["rho"]
 
 
-nb_fourmis = 8
+nb_fourmis = 50
 nb_iter = 25
 
 list_lieux = []
