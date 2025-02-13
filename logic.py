@@ -21,6 +21,7 @@ class TSP_ACO(Graph):
         self.graph.calcul_matrice_cout_od()
         self.shortest_route = {"route": [], "distance": float("inf")}
         self.file_path = file_path
+        self.enable_display = False
 
     def init_fourmis(self):
         self.fourmis = []
@@ -33,7 +34,7 @@ class TSP_ACO(Graph):
         affi = Affichage(self.file_path, self.graph.matrice_cout_od)
         for i in range(self.nb_iter):
             # new fourmis generation
-            print(f"--- Iteration {i} ---")
+            # print(f"--- Iteration {i} ---")
             while len(self.fourmis[0].visited_points) <= self.graph.nb_lieux:
                 for fourmi in self.fourmis:
                     # for each fourmi, we calculate the next point
@@ -44,16 +45,18 @@ class TSP_ACO(Graph):
                 # finish the trajet, before updating pheromones
             # finished lets display !!
             route_lists = [fourmi.visited_points for fourmi in self.fourmis]
-            affi.update_graph(
-                matrice=self.graph.matrice_pheromones,
-                liste_de_route=route_lists,
-                best_route=self.shortest_route["route"],
-            )
-            print(f"finished  G{i} updating pheromones")
+            if self.enable_display:
+                affi.update_graph(
+                    matrice=self.graph.matrice_pheromones,
+                    liste_de_route=route_lists,
+                    best_route=self.shortest_route["route"],
+                )
+            # print(f"finished  G{i} updating pheromones")
             self.update_pheromones(fourmis=self.fourmis)
             self.init_fourmis()
-        print("---finished---")
-        affi.root.mainloop()
+        # print("---finished---")
+        if self.enable_display:
+            affi.root.mainloop()
 
     def calc_next_point(
         self,
