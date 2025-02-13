@@ -25,7 +25,3 @@ aco.init_fourmis()
 
 aco.run()
 print(aco.shortest_route)
-
-# for e in aco.fourmis:
-#     print(e.get_attributes())
-# print("coo")

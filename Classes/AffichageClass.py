@@ -113,7 +113,6 @@ class Affichage:
                 self.distance_min += math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
         self.meilleures_routes[str(longueur_par_route)] = self.best_route
         self.nb_ite += 1
-        print(self.nb_ite)
         self.info_zone.delete(1.0, tk.END)
         self.info_zone.insert(
             tk.END,
